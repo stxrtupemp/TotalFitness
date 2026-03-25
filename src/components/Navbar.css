@@ -1,0 +1,134 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 70px;
+  background: rgba(8, 8, 8, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.navbar__logo {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.navbar__logo span {
+  color: var(--accent);
+}
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.navbar__links a {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  transition: color var(--transition);
+}
+
+.navbar__links a:hover,
+.navbar__links a.active {
+  color: var(--text);
+}
+
+.navbar__links a.active {
+  color: var(--accent);
+}
+
+.btn-sm {
+  padding: 0.5rem 1.25rem !important;
+  font-size: 0.8rem !important;
+  margin-left: 0.5rem;
+}
+
+.navbar__burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.navbar__burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.navbar__burger span.open:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.navbar__burger span.open:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.navbar__burger span.open:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .navbar__burger { display: flex; }
+
+  .navbar__links {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem 1.5rem;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .navbar__links--open { display: flex; }
+
+  .navbar__links a { font-size: 1rem; padding: 0.75rem 0; }
+
+  .btn-sm { margin-left: 0; margin-top: 0.5rem; }
+}
+
+.navbar__admin-link {
+  color: var(--accent) !important;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.3rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.1em;
+  transition: background var(--transition), color var(--transition);
+}
+
+.navbar__admin-link:hover,
+.navbar__admin-link.active {
+  background: var(--accent) !important;
+  color: #000 !important;
+}

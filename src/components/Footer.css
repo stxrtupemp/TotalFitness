@@ -1,0 +1,120 @@
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 4rem 0 0;
+  margin-top: auto;
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .footer__inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .footer__inner { grid-template-columns: 2fr 1fr 1fr 1fr; }
+}
+
+/* Brand */
+.footer__logo {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.footer__logo span { color: var(--accent); }
+
+.footer__brand p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  max-width: 240px;
+}
+
+/* Nav columns */
+.footer__nav,
+.footer__info,
+.footer__hours {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer__nav-label {
+  font-family: var(--font-head);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.footer__nav a,
+.footer__info p,
+.footer__hours p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  transition: color var(--transition);
+  line-height: 1.5;
+}
+
+.footer__nav a:hover { color: var(--accent); }
+
+.footer__logout {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-family: var(--font-head);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+  align-self: flex-start;
+}
+
+.footer__logout:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Bottom bar */
+.footer__bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 0;
+  margin-top: 0.5rem;
+}
+
+.footer__bottom p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.footer__user-badge {
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(200, 255, 0, 0.3);
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+}

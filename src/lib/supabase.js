@@ -1,0 +1,119 @@
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl     = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// ─── Auth ──────────────────────────────────────────────────────────────────────
+
+export const signUp = async (email, password) => {
+  // El trigger handle_new_user() crea el perfil automáticamente
+  const { data, error } = await supabase.auth.signUp({ email, password })
+  if (error) throw error
+  return data
+}
+
+export const signIn = async (email, password) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) throw error
+  return data
+}
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+export const getSession = async () => {
+  const { data: { session } } = await supabase.auth.getSession()
+  return session
+}
+
+// ─── Profiles ─────────────────────────────────────────────────────────────────
+
+export const getUserProfile = async (userId) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getAllUsers() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(`
+      *,
+      subscriptions (*)
+    `);
+
+  if (error) throw error;
+
+  // Supabase devuelve subscriptions como objeto (no array) por la relación 1-a-1
+  // Lo normalizamos a array para que Admin.jsx funcione con ?.[0]
+  return data.map(user => ({
+    ...user,
+    subscriptions: user.subscriptions
+      ? [user.subscriptions]   // objeto → array de un elemento
+      : [],                    // null → array vacío
+  }));
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+export const getSubscription = async (userId) => {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+export const createSubscription = async (userId, plan) => {
+  const start = new Date()
+  const end   = new Date()
+  end.setMonth(end.getMonth() + (plan === 'annual' ? 12 : 1))
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .upsert({
+      user_id:    userId,
+      status:     'active',
+      plan,
+      start_date: start.toISOString(),
+      end_date:   end.toISOString(),
+    }, { onConflict: 'user_id' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export const cancelSubscription = async (userId) => {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .update({ status: 'inactive' })
+    .eq('user_id', userId)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export const updateSubscriptionAdmin = async (userId, updates) => {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .update(updates)
+    .eq('user_id', userId)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
