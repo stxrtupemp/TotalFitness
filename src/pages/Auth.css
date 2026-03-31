@@ -117,3 +117,22 @@
   height: 1px;
   background: var(--border);
 }
+
+.auth-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-forgot {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  transition: color var(--transition);
+  font-family: var(--font-head);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.auth-forgot:hover {
+  color: var(--accent);
+}

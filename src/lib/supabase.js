@@ -107,6 +107,20 @@ export const cancelSubscription = async (userId) => {
   return data
 }
 
+// ─── Password Reset ────────────────────────────────────────────────────────────
+
+export const resetPasswordForEmail = async (email) => {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  })
+  if (error) throw error
+}
+
+export const updatePassword = async (newPassword) => {
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw error
+}
+
 export const updateSubscriptionAdmin = async (userId, updates) => {
   const { data, error } = await supabase
     .from('subscriptions')

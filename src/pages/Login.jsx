@@ -47,7 +47,10 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Contraseña</label>
+            <div className="auth-label-row">
+              <label className="form-label">Contraseña</label>
+              <Link to="/reset-password" className="auth-forgot">¿Olvidaste tu contraseña?</Link>
+            </div>
             <input
               type="password"
               className="form-input"
