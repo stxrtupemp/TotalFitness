@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllUsers, updateSubscriptionAdmin, supabase } from '../lib/supabase'
+import { IconRefresh } from '../components/Icons'
 import Footer from '../components/Footer'
 import './Admin.css'
 
@@ -134,7 +135,7 @@ export default function Admin() {
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <Link to="/adminconfig" className="btn btn-outline">⚙ Configurar Home</Link>
             <button className="btn btn-outline" onClick={load} disabled={loading}>
-              {loading ? <span className="spinner" /> : '↻ Actualizar'}
+              {loading ? <span className="spinner" /> : <><IconRefresh size={15} /> Actualizar</>}
             </button>
           </div>
         </div>

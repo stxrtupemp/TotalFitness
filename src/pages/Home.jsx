@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSubscription } from '../hooks/useSubscription'
 import { useSiteConfig, isVisible } from '../context/SiteConfigContext'
+import {
+  IconBolt, IconBarbell, IconLeaf, IconPhone, IconClock, IconUsers,
+  IconTrophy, IconStar, IconCheck, IconFlex,
+} from '../components/Icons'
 import Footer from '../components/Footer'
 import GymMap from '../components/GymMap'
 import './Home.css'
@@ -22,12 +26,12 @@ const PROMOS_MEMBER = [
 ]
 
 const FEATURES = [
-  { icon: '⚡', title: 'Equipamiento de élite',    desc: 'Más de 200 máquinas de última generación para cada grupo muscular.' },
-  { icon: '🏋️', title: 'Entrenadores certificados', desc: 'Profesionales titulados que diseñan tu plan de entrenamiento personalizado.' },
-  { icon: '🥗', title: 'Nutrición integrada',       desc: 'Asesoramiento nutricional incluido en el plan premium anual.' },
-  { icon: '📱', title: 'App TotalFitness',          desc: 'Reserva clases, controla tu progreso y gestiona tu suscripción.' },
-  { icon: '🕐', title: 'Abierto 24/7',              desc: 'Entrena cuando quieras, sin horarios ni restricciones.' },
-  { icon: '👥', title: '+50 clases semanales',      desc: 'Yoga, pilates, spinning, boxeo, CrossFit y mucho más.' },
+  { Icon: IconBolt,    title: 'Equipamiento de élite',    desc: 'Más de 200 máquinas de última generación para cada grupo muscular.' },
+  { Icon: IconBarbell, title: 'Entrenadores certificados', desc: 'Profesionales titulados que diseñan tu plan de entrenamiento personalizado.' },
+  { Icon: IconLeaf,    title: 'Nutrición integrada',       desc: 'Asesoramiento nutricional incluido en el plan premium anual.' },
+  { Icon: IconPhone,   title: 'App TotalFitness',          desc: 'Reserva clases, controla tu progreso y gestiona tu suscripción.' },
+  { Icon: IconClock,   title: 'Abierto 24/7',              desc: 'Entrena cuando quieras, sin horarios ni restricciones.' },
+  { Icon: IconUsers,   title: '+50 clases semanales',      desc: 'Yoga, pilates, spinning, boxeo, CrossFit y mucho más.' },
 ]
 
 const PLANS = [
@@ -135,7 +139,7 @@ export default function Home() {
         <div className="container hero__content">
           <div className="hero__left">
             <span className="hero__eyebrow animate-fade-up">
-              {hasActiveSub ? 'Bienvenido/a de vuelta 💪' : config.hero_eyebrow}
+              {hasActiveSub ? <><IconFlex size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3em' }} />Bienvenido/a de vuelta</> : config.hero_eyebrow}
             </span>
 
             <h1 className="hero__title animate-fade-up animate-fade-up-delay-1">
@@ -191,28 +195,28 @@ export default function Home() {
             <div className="hero__right animate-fade-up animate-fade-up-delay-3">
               <div className="hero__panel">
                 <div className="hero__panel-card">
-                  <span className="hero__panel-icon">🏆</span>
+                  <span className="hero__panel-icon"><IconTrophy size={22} /></span>
                   <div>
                     <strong>Entrenadores certificados</strong>
                     <span>Planes 100% personalizados</span>
                   </div>
                 </div>
                 <div className="hero__panel-card hero__panel-card--accent">
-                  <span className="hero__panel-icon">⚡</span>
+                  <span className="hero__panel-icon"><IconBolt size={22} /></span>
                   <div>
                     <strong>Equipamiento de élite</strong>
                     <span>+200 máquinas modernas</span>
                   </div>
                 </div>
                 <div className="hero__panel-card">
-                  <span className="hero__panel-icon">🕐</span>
+                  <span className="hero__panel-icon"><IconClock size={22} /></span>
                   <div>
                     <strong>Abierto 24/7</strong>
                     <span>Sin horarios restrictivos</span>
                   </div>
                 </div>
                 <div className="hero__panel-card">
-                  <span className="hero__panel-icon">🥗</span>
+                  <span className="hero__panel-icon"><IconLeaf size={22} /></span>
                   <div>
                     <strong>Nutrición integrada</strong>
                     <span>Plan anual incluido</span>
@@ -263,7 +267,7 @@ export default function Home() {
             <div className="features-grid">
               {FEATURES.map((f, i) => (
                 <div key={i} className={`feature-card reveal reveal-delay-${(i % 3) + 1}`}>
-                  <span className="feature-card__icon">{f.icon}</span>
+                  <span className="feature-card__icon"><f.Icon size={28} /></span>
                   <h3 className="feature-card__title">{f.title}</h3>
                   <p className="feature-card__desc">{f.desc}</p>
                 </div>
@@ -297,7 +301,7 @@ export default function Home() {
                   <ul className="pricing-card__features">
                     {p.features.map(f => (
                       <li key={f}>
-                        <span className="pricing-card__check">✓</span>
+                        <span className="pricing-card__check"><IconCheck size={14} /></span>
                         {f}
                       </li>
                     ))}
@@ -374,7 +378,7 @@ export default function Home() {
               {TESTIMONIALS.map((t, i) => (
                 <div key={i} className={`testimonial-card reveal reveal-delay-${i + 1}`}>
                   <div className="testimonial-card__stars">
-                    {'★'.repeat(t.stars)}
+                    {Array.from({ length: t.stars }, (_, i) => <IconStar key={i} size={14} />)}
                   </div>
                   <p className="testimonial-card__text">"{t.text}"</p>
                   <div className="testimonial-card__author">

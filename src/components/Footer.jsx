@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { signOut } from '../lib/supabase'
-import { useNavigate } from 'react-router-dom'
+import { IconClock, IconBolt, IconMember } from './Icons'
 import './Footer.css'
 
 export default function Footer() {
@@ -61,7 +61,7 @@ export default function Footer() {
             <strong>08:00 – 21:00</strong>
           </div>
           <div className="footer__hours-row footer__hours-row--accent">
-            <span>🕐 Gym 24/7</span>
+            <span><IconClock size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3em' }} />Gym 24/7</span>
             <strong>Acceso libre</strong>
           </div>
         </div>
@@ -75,7 +75,10 @@ export default function Footer() {
           <div className="footer__bottom-right">
             {user && (
               <span className="footer__user-badge">
-                {isAdmin ? '⚡ Admin' : '✓ Miembro'}
+                {isAdmin
+                  ? <><IconBolt size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.25em' }} />Admin</>
+                  : <><IconMember size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.25em' }} />Miembro</>
+                }
               </span>
             )}
             {user && (

@@ -137,6 +137,9 @@
 .plan-card__features li {
   font-size: 0.8rem;
   color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
 }
 
 /* Payment form */

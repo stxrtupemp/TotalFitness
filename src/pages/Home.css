@@ -334,8 +334,9 @@
 }
 
 .feature-card__icon {
-  font-size: 2rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  color: var(--accent);
   margin-bottom: 1rem;
 }
 
@@ -473,9 +474,9 @@
 }
 
 .pricing-card__check {
+  display: flex;
+  align-items: center;
   color: var(--accent);
-  font-family: var(--font-head);
-  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -621,9 +622,9 @@
 }
 
 .testimonial-card__stars {
+  display: flex;
+  gap: 0.15rem;
   color: var(--accent);
-  font-size: 1rem;
-  letter-spacing: 0.05em;
 }
 
 .testimonial-card__text {

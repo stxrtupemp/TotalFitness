@@ -1,3 +1,4 @@
+import { IconPin, IconClock, IconCall, IconMail, IconCar } from './Icons'
 import './GymMap.css'
 
 const GYM_EMBED =
@@ -27,7 +28,7 @@ export default function GymMap() {
             referrerPolicy="no-referrer-when-downgrade"
           />
           <div className="gymmap__overlay-badge">
-            <span className="gymmap__pin">📍</span>
+            <span className="gymmap__pin"><IconPin size={22} /></span>
             <div>
               <strong>TotalFitness</strong>
               <span>Pilar de la Horadada</span>
@@ -37,7 +38,7 @@ export default function GymMap() {
 
         <div className="gymmap__details">
           <div className="gymmap__detail">
-            <span className="gymmap__detail-icon">🕐</span>
+            <span className="gymmap__detail-icon"><IconClock size={22} /></span>
             <div>
               <strong>Horario</strong>
               <span>Lun–Vie: 06:00–23:00</span>
@@ -45,21 +46,21 @@ export default function GymMap() {
             </div>
           </div>
           <div className="gymmap__detail">
-            <span className="gymmap__detail-icon">📞</span>
+            <span className="gymmap__detail-icon"><IconCall size={22} /></span>
             <div>
               <strong>Teléfono</strong>
               <span>+34 965 000 000</span>
             </div>
           </div>
           <div className="gymmap__detail">
-            <span className="gymmap__detail-icon">✉️</span>
+            <span className="gymmap__detail-icon"><IconMail size={22} /></span>
             <div>
               <strong>Email</strong>
               <span>info@totalfitness.es</span>
             </div>
           </div>
           <div className="gymmap__detail">
-            <span className="gymmap__detail-icon">🚗</span>
+            <span className="gymmap__detail-icon"><IconCar size={22} /></span>
             <div>
               <strong>Aparcamiento</strong>
               <span>Gratuito en el edificio</span>

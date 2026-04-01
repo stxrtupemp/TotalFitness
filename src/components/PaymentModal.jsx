@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconClose, IconCheck } from './Icons'
 import './PaymentModal.css'
 
 const PLANS = [
@@ -39,7 +40,7 @@ export default function PaymentModal({ onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        <button className="modal__close" onClick={onClose}>✕</button>
+        <button className="modal__close" onClick={onClose} aria-label="Cerrar"><IconClose size={16} /></button>
 
         {/* ── Plan selection ── */}
         {step === 'plan' && (
@@ -59,7 +60,7 @@ export default function PaymentModal({ onClose, onSuccess }) {
                     <span className="plan-card__period">/{p.period}</span>
                   </div>
                   <ul className="plan-card__features">
-                    {p.features.map(f => <li key={f}>✓ {f}</li>)}
+                    {p.features.map(f => <li key={f}><IconCheck size={13} style={{ flexShrink: 0, marginRight: '0.4em', color: 'var(--accent)' }} />{f}</li>)}
                   </ul>
                 </button>
               ))}
@@ -140,7 +141,7 @@ export default function PaymentModal({ onClose, onSuccess }) {
         {/* ── Done ── */}
         {step === 'done' && (
           <div className="modal__state">
-            <div className="modal__checkmark">✓</div>
+            <div className="modal__checkmark"><IconCheck size={28} /></div>
             <h2>¡Suscripción activada!</h2>
             <p>Bienvenido/a a TotalFitness. Tu plan <strong>{plan === 'monthly' ? 'Mensual' : 'Anual'}</strong> ya está activo.</p>
             <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={() => onSuccess(plan)}>

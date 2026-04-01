@@ -80,7 +80,11 @@
   pointer-events: none;
 }
 
-.gymmap__pin { font-size: 1.25rem; }
+.gymmap__pin {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
 
 .gymmap__overlay-badge strong {
   display: block;
@@ -126,9 +130,11 @@
 }
 
 .gymmap__detail-icon {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: flex-start;
   flex-shrink: 0;
   margin-top: 0.1rem;
+  color: var(--accent);
 }
 
 .gymmap__detail div {
