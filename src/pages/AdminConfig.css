@@ -1,0 +1,233 @@
+.admin-config__inner {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Config block ── */
+.cfg-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+}
+
+.cfg-block__head {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cfg-block__title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+}
+
+.cfg-block__desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Section toggles ── */
+.cfg-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cfg-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), opacity var(--transition);
+}
+
+.cfg-toggle-row:hover {
+  border-color: var(--border-hover);
+}
+
+.cfg-toggle-row--hidden {
+  opacity: 0.55;
+}
+
+.cfg-toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.cfg-toggle-label {
+  font-family: var(--font-head);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.cfg-toggle-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Toggle button (pill) */
+.cfg-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.85rem 0.4rem 0.55rem;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  flex-shrink: 0;
+  min-width: 96px;
+  justify-content: center;
+}
+
+.cfg-toggle-btn--on {
+  background: var(--success-dim);
+  border-color: rgba(0, 230, 118, 0.3);
+  color: var(--success);
+}
+
+.cfg-toggle-btn--on:hover {
+  background: rgba(0, 230, 118, 0.2);
+}
+
+.cfg-toggle-btn--off {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.cfg-toggle-btn--off:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.cfg-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Knob dot */
+.cfg-toggle-knob {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.cfg-toggle-text {
+  line-height: 1;
+}
+
+/* ── Text fields ── */
+.cfg-text-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cfg-text-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.cfg-text-field:first-child {
+  grid-column: 1 / -1;
+}
+
+.cfg-textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+
+.cfg-text-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── SQL hint ── */
+.cfg-sql-hint {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cfg-sql-hint summary {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition);
+}
+
+.cfg-sql-hint summary:hover { color: var(--text); }
+
+.cfg-sql-hint pre {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  background: var(--surface-2);
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.6;
+}
+
+/* Reuse toast from Dashboard */
+.dash-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 500;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.dash-toast--success {
+  background: var(--success-dim);
+  color: var(--success);
+  border: 1px solid rgba(0,230,118,0.25);
+}
+
+.dash-toast--error {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border: 1px solid rgba(255,68,68,0.25);
+}

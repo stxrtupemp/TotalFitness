@@ -107,6 +107,57 @@ export const cancelSubscription = async (userId) => {
   return data
 }
 
+// ─── Site Config ──────────────────────────────────────────────────────────────
+/*
+  Required Supabase table (run once in SQL editor):
+
+  create table if not exists site_config (
+    key   text primary key,
+    value text not null default ''
+  );
+  alter table site_config enable row level security;
+  create policy "public read"  on site_config for select using (true);
+  create policy "admin write"  on site_config for all
+    using (exists (select 1 from profiles where id = auth.uid() and role = 'admin'));
+
+  -- Seed default values:
+  insert into site_config (key, value) values
+    ('section_promos',       'true'),
+    ('section_features',     'true'),
+    ('section_pricing',      'true'),
+    ('section_classes',      'true'),
+    ('section_testimonials', 'true'),
+    ('section_cta',          'true'),
+    ('section_map',          'true'),
+    ('hero_eyebrow',         'El gimnasio que te transforma'),
+    ('hero_title',           'ENTRENA.\nSUPÉRATE.\nSIN LÍMITES.'),
+    ('hero_desc',            'Instalaciones premium, entrenadores de élite y tecnología de punta. Tu mejor versión comienza hoy.'),
+    ('cta_title',            '¿Listo para empezar?'),
+    ('cta_subtitle',         'Únete hoy y transforma tu cuerpo y tu mente. Sin excusas.')
+  on conflict (key) do nothing;
+*/
+
+export const getSiteConfig = async () => {
+  const { data, error } = await supabase.from('site_config').select('key, value')
+  if (error) throw error
+  return Object.fromEntries(data.map(r => [r.key, r.value]))
+}
+
+export const setSiteConfig = async (key, value) => {
+  const { error } = await supabase
+    .from('site_config')
+    .upsert({ key, value }, { onConflict: 'key' })
+  if (error) throw error
+}
+
+export const setSiteConfigBatch = async (entries) => {
+  const rows = Object.entries(entries).map(([key, value]) => ({ key, value: String(value) }))
+  const { error } = await supabase
+    .from('site_config')
+    .upsert(rows, { onConflict: 'key' })
+  if (error) throw error
+}
+
 // ─── Password Reset ────────────────────────────────────────────────────────────
 
 export const resetPasswordForEmail = async (email) => {

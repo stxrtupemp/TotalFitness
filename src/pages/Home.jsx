@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSubscription } from '../hooks/useSubscription'
+import { useSiteConfig, isVisible } from '../context/SiteConfigContext'
 import Footer from '../components/Footer'
 import GymMap from '../components/GymMap'
 import './Home.css'
@@ -69,7 +70,7 @@ const TESTIMONIALS = [
 
 const DAYS_SHORT = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
-// ── Scroll-reveal: observe all .reveal elements inside a section ref ─────────
+// ── Scroll-reveal hook ────────────────────────────────────────────────────────
 function useReveal() {
   const ref = useRef(null)
   useEffect(() => {
@@ -99,9 +100,13 @@ function useReveal() {
 export default function Home() {
   const { user }          = useAuth()
   const { isActive, loading: subLoading } = useSubscription(user?.id)
+  const { config }        = useSiteConfig()
 
   const hasActiveSub = user && isActive
   const promos       = hasActiveSub ? PROMOS_MEMBER : PROMOS_GUEST
+
+  // Parse hero title lines — last line gets accent colour
+  const heroTitleLines = (config.hero_title || '').split('\n').filter(Boolean)
 
   // Hero glow mouse tracking
   const heroRef = useRef(null)
@@ -130,17 +135,21 @@ export default function Home() {
         <div className="container hero__content">
           <div className="hero__left">
             <span className="hero__eyebrow animate-fade-up">
-              {hasActiveSub ? 'Bienvenido/a de vuelta 💪' : 'El gimnasio que te transforma'}
+              {hasActiveSub ? 'Bienvenido/a de vuelta 💪' : config.hero_eyebrow}
             </span>
 
             <h1 className="hero__title animate-fade-up animate-fade-up-delay-1">
-              ENTRENA.<br />SUPÉRATE.<br /><span>SIN LÍMITES.</span>
+              {heroTitleLines.map((line, i) =>
+                i < heroTitleLines.length - 1
+                  ? <span key={i}>{line}<br /></span>
+                  : <span key={i} className="hero__title-last">{line}</span>
+              )}
             </h1>
 
             <p className="hero__desc animate-fade-up animate-fade-up-delay-2">
               {hasActiveSub
                 ? 'Tu suscripción está activa. Accede a todos tus beneficios y reserva tus clases.'
-                : 'Instalaciones premium, entrenadores de élite y tecnología de punta. Tu mejor versión comienza hoy.'
+                : config.hero_desc
               }
             </p>
 
@@ -216,52 +225,56 @@ export default function Home() {
       </section>
 
       {/* ── Promos ── */}
-      <section className="section" ref={refPromos}>
-        <div className="container reveal">
-          <div className="section__head">
-            <span className="section__tag">{hasActiveSub ? 'Para miembros' : 'Promociones'}</span>
-            <h2 className="section__title">{hasActiveSub ? 'Ventajas exclusivas' : 'Ofertas exclusivas'}</h2>
+      {isVisible(config, 'section_promos') && (
+        <section className="section" ref={refPromos}>
+          <div className="container reveal">
+            <div className="section__head">
+              <span className="section__tag">{hasActiveSub ? 'Para miembros' : 'Promociones'}</span>
+              <h2 className="section__title">{hasActiveSub ? 'Ventajas exclusivas' : 'Ofertas exclusivas'}</h2>
+            </div>
+            <div className="promos-grid">
+              {promos.map((p, i) => (
+                <div key={i} className={`promo-card reveal reveal-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}>
+                  <span className="promo-card__tag">{p.tag}</span>
+                  <h3 className="promo-card__title">{p.title}</h3>
+                  <p className="promo-card__desc">{p.desc}</p>
+                  <Link
+                    to={user ? '/dashboard' : '/register'}
+                    className={`btn ${p.accent ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ marginTop: 'auto', alignSelf: 'flex-start' }}
+                  >
+                    {p.cta} →
+                  </Link>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="promos-grid">
-            {promos.map((p, i) => (
-              <div key={i} className={`promo-card reveal reveal-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}>
-                <span className="promo-card__tag">{p.tag}</span>
-                <h3 className="promo-card__title">{p.title}</h3>
-                <p className="promo-card__desc">{p.desc}</p>
-                <Link
-                  to={user ? '/dashboard' : '/register'}
-                  className={`btn ${p.accent ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ marginTop: 'auto', alignSelf: 'flex-start' }}
-                >
-                  {p.cta} →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Features ── */}
-      <section className="section section--dark" ref={refFeats}>
-        <div className="container">
-          <div className="section__head reveal">
-            <span className="section__tag">Por qué elegirnos</span>
-            <h2 className="section__title">Todo lo que necesitas</h2>
+      {isVisible(config, 'section_features') && (
+        <section className="section section--dark" ref={refFeats}>
+          <div className="container">
+            <div className="section__head reveal">
+              <span className="section__tag">Por qué elegirnos</span>
+              <h2 className="section__title">Todo lo que necesitas</h2>
+            </div>
+            <div className="features-grid">
+              {FEATURES.map((f, i) => (
+                <div key={i} className={`feature-card reveal reveal-delay-${(i % 3) + 1}`}>
+                  <span className="feature-card__icon">{f.icon}</span>
+                  <h3 className="feature-card__title">{f.title}</h3>
+                  <p className="feature-card__desc">{f.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="features-grid">
-            {FEATURES.map((f, i) => (
-              <div key={i} className={`feature-card reveal reveal-delay-${(i % 3) + 1}`}>
-                <span className="feature-card__icon">{f.icon}</span>
-                <h3 className="feature-card__title">{f.title}</h3>
-                <p className="feature-card__desc">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Pricing ── */}
-      {!hasActiveSub && (
+      {!hasActiveSub && isVisible(config, 'section_pricing') && (
         <section className="section pricing-section" ref={refPricing}>
           <div className="container">
             <div className="section__head reveal">
@@ -304,82 +317,86 @@ export default function Home() {
       )}
 
       {/* ── Class Schedule ── */}
-      <section className="section section--dark schedule-section" ref={refClasses}>
-        <div className="container">
-          <div className="section__head reveal">
-            <span className="section__tag">Horarios</span>
-            <h2 className="section__title">Clases semanales</h2>
-            <p className="section__subtitle">Reserva tu plaza en la app o en recepción. Plazas limitadas.</p>
-          </div>
-          <div className="schedule-grid reveal reveal-delay-1">
-            {CLASSES.map((cls, i) => (
-              <div key={i} className="schedule-card">
-                <div className="schedule-card__header" style={{ borderLeftColor: cls.color }}>
-                  <div>
-                    <h3 className="schedule-card__name">{cls.name}</h3>
-                    <span className="schedule-card__trainer">{cls.trainer}</span>
+      {isVisible(config, 'section_classes') && (
+        <section className="section section--dark schedule-section" ref={refClasses}>
+          <div className="container">
+            <div className="section__head reveal">
+              <span className="section__tag">Horarios</span>
+              <h2 className="section__title">Clases semanales</h2>
+              <p className="section__subtitle">Reserva tu plaza en la app o en recepción. Plazas limitadas.</p>
+            </div>
+            <div className="schedule-grid reveal reveal-delay-1">
+              {CLASSES.map((cls, i) => (
+                <div key={i} className="schedule-card">
+                  <div className="schedule-card__header" style={{ borderLeftColor: cls.color }}>
+                    <div>
+                      <h3 className="schedule-card__name">{cls.name}</h3>
+                      <span className="schedule-card__trainer">{cls.trainer}</span>
+                    </div>
+                    <div className="schedule-card__time">{cls.time}</div>
                   </div>
-                  <div className="schedule-card__time">{cls.time}</div>
-                </div>
-                <div className="schedule-card__body">
-                  <div className="schedule-card__days">
-                    {DAYS_SHORT.map(d => (
-                      <span
-                        key={d}
-                        className={`schedule-day ${cls.days.includes(d) ? 'schedule-day--active' : ''}`}
-                        style={cls.days.includes(d) ? { background: cls.color, color: cls.color === '#ff4444' || cls.color === '#ffb400' ? '#fff' : '#000', borderColor: cls.color } : {}}
-                      >
-                        {d}
-                      </span>
-                    ))}
+                  <div className="schedule-card__body">
+                    <div className="schedule-card__days">
+                      {DAYS_SHORT.map(d => (
+                        <span
+                          key={d}
+                          className={`schedule-day ${cls.days.includes(d) ? 'schedule-day--active' : ''}`}
+                          style={cls.days.includes(d) ? { background: cls.color, color: cls.color === '#ff4444' || cls.color === '#ffb400' ? '#fff' : '#000', borderColor: cls.color } : {}}
+                        >
+                          {d}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="schedule-card__level" style={{ color: cls.color }}>{cls.level}</span>
                   </div>
-                  <span className="schedule-card__level" style={{ color: cls.color }}>{cls.level}</span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="schedule-cta reveal reveal-delay-2">
+              <p>¿Quieres ver el horario completo o reservar plaza?</p>
+              <Link to={user ? '/dashboard' : '/register'} className="btn btn-outline">
+                {user ? 'Ir a mi cuenta →' : 'Únete y reserva →'}
+              </Link>
+            </div>
           </div>
-          <div className="schedule-cta reveal reveal-delay-2">
-            <p>¿Quieres ver el horario completo o reservar plaza?</p>
-            <Link to={user ? '/dashboard' : '/register'} className="btn btn-outline">
-              {user ? 'Ir a mi cuenta →' : 'Únete y reserva →'}
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── Testimonials ── */}
-      <section className="section" ref={refTestim}>
-        <div className="container">
-          <div className="section__head reveal">
-            <span className="section__tag">Testimonios</span>
-            <h2 className="section__title">Historias reales</h2>
-          </div>
-          <div className="testimonials-grid">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className={`testimonial-card reveal reveal-delay-${i + 1}`}>
-                <div className="testimonial-card__stars">
-                  {'★'.repeat(t.stars)}
-                </div>
-                <p className="testimonial-card__text">"{t.text}"</p>
-                <div className="testimonial-card__author">
-                  <div className="testimonial-card__avatar">{t.name[0]}</div>
-                  <div>
-                    <strong>{t.name}</strong>
-                    <span>{t.role}</span>
+      {isVisible(config, 'section_testimonials') && (
+        <section className="section" ref={refTestim}>
+          <div className="container">
+            <div className="section__head reveal">
+              <span className="section__tag">Testimonios</span>
+              <h2 className="section__title">Historias reales</h2>
+            </div>
+            <div className="testimonials-grid">
+              {TESTIMONIALS.map((t, i) => (
+                <div key={i} className={`testimonial-card reveal reveal-delay-${i + 1}`}>
+                  <div className="testimonial-card__stars">
+                    {'★'.repeat(t.stars)}
+                  </div>
+                  <p className="testimonial-card__text">"{t.text}"</p>
+                  <div className="testimonial-card__author">
+                    <div className="testimonial-card__avatar">{t.name[0]}</div>
+                    <div>
+                      <strong>{t.name}</strong>
+                      <span>{t.role}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── CTA — solo sin suscripción ── */}
-      {!hasActiveSub && (
+      {!hasActiveSub && isVisible(config, 'section_cta') && (
         <section className="cta-section" ref={refCta}>
           <div className="container cta-section__inner reveal">
-            <h2 className="cta-section__title">¿Listo para empezar?</h2>
-            <p>Únete hoy y transforma tu cuerpo y tu mente. Sin excusas.</p>
+            <h2 className="cta-section__title">{config.cta_title}</h2>
+            <p>{config.cta_subtitle}</p>
             <Link to={user ? '/dashboard' : '/register'} className="btn btn-primary cta-section__btn">
               {user ? 'Activar suscripción →' : 'Crear cuenta gratis →'}
             </Link>
@@ -387,7 +404,9 @@ export default function Home() {
         </section>
       )}
 
-      <GymMap />
+      {/* ── Map ── */}
+      {isVisible(config, 'section_map') && <GymMap />}
+
       <Footer />
     </div>
   )

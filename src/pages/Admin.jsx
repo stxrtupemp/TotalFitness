@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { getAllUsers, updateSubscriptionAdmin, supabase } from '../lib/supabase'
 import Footer from '../components/Footer'
 import './Admin.css'
@@ -130,9 +131,12 @@ export default function Admin() {
             <span className="admin-header__eyebrow">Panel de administración</span>
             <h1 className="admin-header__title">Gestión de usuarios</h1>
           </div>
-          <button className="btn btn-outline" onClick={load} disabled={loading}>
-            {loading ? <span className="spinner" /> : '↻ Actualizar'}
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Link to="/adminconfig" className="btn btn-outline">⚙ Configurar Home</Link>
+            <button className="btn btn-outline" onClick={load} disabled={loading}>
+              {loading ? <span className="spinner" /> : '↻ Actualizar'}
+            </button>
+          </div>
         </div>
 
         {/* Stats */}

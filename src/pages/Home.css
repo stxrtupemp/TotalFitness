@@ -154,7 +154,8 @@
   color: var(--text);
 }
 
-.hero__title span { color: var(--accent); }
+.hero__title span { color: var(--text); }
+.hero__title-last  { color: var(--accent); }
 
 .hero__desc {
   font-size: 1.05rem;
