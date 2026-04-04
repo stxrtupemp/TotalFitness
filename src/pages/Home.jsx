@@ -231,14 +231,14 @@ export default function Home() {
       {/* ── Promos ── */}
       {isVisible(config, 'section_promos') && (
         <section className="section" ref={refPromos}>
-          <div className="container reveal">
-            <div className="section__head">
+          <div className="container">
+            <div className="section__head reveal">
               <span className="section__tag">{hasActiveSub ? 'Para miembros' : 'Promociones'}</span>
               <h2 className="section__title">{hasActiveSub ? 'Ventajas exclusivas' : 'Ofertas exclusivas'}</h2>
             </div>
             <div className="promos-grid">
               {promos.map((p, i) => (
-                <div key={i} className={`promo-card reveal reveal-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}>
+                <div key={i} className={`promo-card animate-fade-up animate-fade-up-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}>
                   <span className="promo-card__tag">{p.tag}</span>
                   <h3 className="promo-card__title">{p.title}</h3>
                   <p className="promo-card__desc">{p.desc}</p>
