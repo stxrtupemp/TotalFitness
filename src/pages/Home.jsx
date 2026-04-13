@@ -1,5 +1,7 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useLayoutEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useAuth } from '../context/AuthContext'
 import { useSubscription } from '../hooks/useSubscription'
 import { useSiteConfig, isVisible } from '../context/SiteConfigContext'
@@ -10,6 +12,8 @@ import {
 import Footer from '../components/Footer'
 import GymMap from '../components/GymMap'
 import './Home.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -74,32 +78,6 @@ const TESTIMONIALS = [
 
 const DAYS_SHORT = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
-// ── Scroll-reveal hook ────────────────────────────────────────────────────────
-function useReveal() {
-  const ref = useRef(null)
-  useEffect(() => {
-    const container = ref.current
-    if (!container) return
-    const els = container.querySelectorAll('.reveal')
-    if (els.length === 0) return
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed')
-            obs.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    )
-    els.forEach(el => obs.observe(el))
-    return () => obs.disconnect()
-  }, [])
-  return ref
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Home() {
   const { user }          = useAuth()
@@ -109,7 +87,6 @@ export default function Home() {
   const hasActiveSub = user && isActive
   const promos       = hasActiveSub ? PROMOS_MEMBER : PROMOS_GUEST
 
-  // Parse hero title lines — last line gets accent colour
   const heroTitleLines = (config.hero_title || '').split('\n').filter(Boolean)
 
   // Hero glow mouse tracking
@@ -121,13 +98,139 @@ export default function Home() {
     heroRef.current.style.setProperty('--gy', `${e.clientY - rect.top}px`)
   }, [])
 
-  // Reveal refs
-  const refPromos  = useReveal()
-  const refFeats   = useReveal()
-  const refPricing = useReveal()
-  const refClasses = useReveal()
-  const refTestim  = useReveal()
-  const refCta     = useReveal()
+  // ── Hero parallax (always, no data dependency) ────────────────────────────
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to('.hero__grid-bg', {
+        yPercent: -18,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1,
+        },
+      })
+      gsap.to('.hero__glow-wrap', {
+        y: -140,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,
+        },
+      })
+    })
+    return () => ctx.revert()
+  }, [])
+
+  // ── Scroll-triggered section animations ───────────────────────────────────
+  useLayoutEffect(() => {
+    if (subLoading) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const ctx = gsap.context(() => {
+      // Section heads
+      gsap.utils.toArray('.section__head').forEach(el => {
+        gsap.fromTo(el,
+          { opacity: 0, y: 42 },
+          {
+            opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+          }
+        )
+      })
+
+      // Feature cards — stagger from grid
+      const featureCards = gsap.utils.toArray('.feature-card')
+      if (featureCards.length) {
+        gsap.fromTo(featureCards,
+          { opacity: 0, y: 50, scale: 0.95 },
+          {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.65, stagger: 0.09, ease: 'power3.out',
+            scrollTrigger: { trigger: '.features-grid', start: 'top 82%', once: true },
+          }
+        )
+      }
+
+      // Pricing cards — scale-back pop
+      const pricingCards = gsap.utils.toArray('.pricing-card')
+      if (pricingCards.length) {
+        gsap.fromTo(pricingCards,
+          { opacity: 0, y: 55, scale: 0.93 },
+          {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.75, stagger: 0.18, ease: 'back.out(1.2)',
+            scrollTrigger: { trigger: '.pricing-grid', start: 'top 80%', once: true },
+          }
+        )
+      }
+
+      // Schedule cards — quick cascade
+      const scheduleCards = gsap.utils.toArray('.schedule-card')
+      if (scheduleCards.length) {
+        gsap.fromTo(scheduleCards,
+          { opacity: 0, y: 35 },
+          {
+            opacity: 1, y: 0,
+            duration: 0.55, stagger: 0.07, ease: 'power2.out',
+            scrollTrigger: { trigger: '.schedule-grid', start: 'top 82%', once: true },
+          }
+        )
+      }
+      const scheduleCta = document.querySelector('.schedule-cta')
+      if (scheduleCta) {
+        gsap.fromTo(scheduleCta,
+          { opacity: 0, y: 22 },
+          {
+            opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
+            scrollTrigger: { trigger: scheduleCta, start: 'top 90%', once: true },
+          }
+        )
+      }
+
+      // Testimonial cards
+      const testimonialCards = gsap.utils.toArray('.testimonial-card')
+      if (testimonialCards.length) {
+        gsap.fromTo(testimonialCards,
+          { opacity: 0, y: 45, scale: 0.96 },
+          {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.65, stagger: 0.14, ease: 'power3.out',
+            scrollTrigger: { trigger: '.testimonials-grid', start: 'top 82%', once: true },
+          }
+        )
+      }
+
+      // CTA section
+      const ctaInner = document.querySelector('.cta-section__inner')
+      if (ctaInner) {
+        gsap.fromTo(ctaInner,
+          { opacity: 0, y: 38, scale: 0.96 },
+          {
+            opacity: 1, y: 0, scale: 1, duration: 0.85, ease: 'power3.out',
+            scrollTrigger: { trigger: '.cta-section', start: 'top 78%', once: true },
+          }
+        )
+      }
+
+      // GymMap
+      const gymmap = document.querySelector('.gymmap')
+      if (gymmap) {
+        gsap.fromTo(gymmap,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1, y: 0, duration: 0.75, ease: 'power2.out',
+            scrollTrigger: { trigger: gymmap, start: 'top 82%', once: true },
+          }
+        )
+      }
+    })
+
+    return () => ctx.revert()
+  }, [subLoading])
 
   return (
     <div className="page home">
@@ -135,11 +238,14 @@ export default function Home() {
       {/* ── Hero ── */}
       <section className="hero" ref={heroRef} onMouseMove={handleHeroMouseMove}>
         <div className="hero__grid-bg" aria-hidden />
-        <div className="hero__glow" aria-hidden />
+        <div className="hero__glow-wrap" aria-hidden><div className="hero__glow" /></div>
         <div className="container hero__content">
           <div className="hero__left">
             <span className="hero__eyebrow animate-fade-up">
-              {hasActiveSub ? <><IconFlex size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3em' }} />Bienvenido/a de vuelta</> : config.hero_eyebrow}
+              {hasActiveSub
+                ? <><IconFlex size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3em' }} />Bienvenido/a de vuelta</>
+                : config.hero_eyebrow
+              }
             </span>
 
             <h1 className="hero__title animate-fade-up animate-fade-up-delay-1">
@@ -230,15 +336,18 @@ export default function Home() {
 
       {/* ── Promos ── */}
       {isVisible(config, 'section_promos') && (
-        <section className="section" ref={refPromos}>
+        <section className="section">
           <div className="container">
-            <div className="section__head reveal">
+            <div className="section__head">
               <span className="section__tag">{hasActiveSub ? 'Para miembros' : 'Promociones'}</span>
               <h2 className="section__title">{hasActiveSub ? 'Ventajas exclusivas' : 'Ofertas exclusivas'}</h2>
             </div>
             <div className="promos-grid">
               {promos.map((p, i) => (
-                <div key={i} className={`promo-card animate-fade-up animate-fade-up-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}>
+                <div
+                  key={i}
+                  className={`promo-card animate-fade-up animate-fade-up-delay-${i + 1} ${p.accent ? 'promo-card--accent' : ''}`}
+                >
                   <span className="promo-card__tag">{p.tag}</span>
                   <h3 className="promo-card__title">{p.title}</h3>
                   <p className="promo-card__desc">{p.desc}</p>
@@ -258,15 +367,15 @@ export default function Home() {
 
       {/* ── Features ── */}
       {isVisible(config, 'section_features') && (
-        <section className="section section--dark" ref={refFeats}>
+        <section className="section section--dark">
           <div className="container">
-            <div className="section__head reveal">
+            <div className="section__head">
               <span className="section__tag">Por qué elegirnos</span>
               <h2 className="section__title">Todo lo que necesitas</h2>
             </div>
             <div className="features-grid">
               {FEATURES.map((f, i) => (
-                <div key={i} className={`feature-card reveal reveal-delay-${(i % 3) + 1}`}>
+                <div key={i} className="feature-card">
                   <span className="feature-card__icon"><f.Icon size={28} /></span>
                   <h3 className="feature-card__title">{f.title}</h3>
                   <p className="feature-card__desc">{f.desc}</p>
@@ -279,16 +388,16 @@ export default function Home() {
 
       {/* ── Pricing ── */}
       {!hasActiveSub && isVisible(config, 'section_pricing') && (
-        <section className="section pricing-section" ref={refPricing}>
+        <section className="section pricing-section">
           <div className="container">
-            <div className="section__head reveal">
+            <div className="section__head">
               <span className="section__tag">Precios</span>
               <h2 className="section__title">Elige tu plan</h2>
               <p className="section__subtitle">Sin permanencia en el mensual. El anual se factura en un único pago de 239.88€.</p>
             </div>
             <div className="pricing-grid">
               {PLANS.map((p, i) => (
-                <div key={p.id} className={`pricing-card reveal reveal-delay-${i + 1} ${p.highlight ? 'pricing-card--highlight' : ''}`}>
+                <div key={p.id} className={`pricing-card ${p.highlight ? 'pricing-card--highlight' : ''}`}>
                   {p.badge && <span className="pricing-card__badge">{p.badge}</span>}
                   <div className="pricing-card__head">
                     <span className="pricing-card__label">{p.label}</span>
@@ -322,14 +431,14 @@ export default function Home() {
 
       {/* ── Class Schedule ── */}
       {isVisible(config, 'section_classes') && (
-        <section className="section section--dark schedule-section" ref={refClasses}>
+        <section className="section section--dark schedule-section">
           <div className="container">
-            <div className="section__head reveal">
+            <div className="section__head">
               <span className="section__tag">Horarios</span>
               <h2 className="section__title">Clases semanales</h2>
               <p className="section__subtitle">Reserva tu plaza en la app o en recepción. Plazas limitadas.</p>
             </div>
-            <div className="schedule-grid reveal reveal-delay-1">
+            <div className="schedule-grid">
               {CLASSES.map((cls, i) => (
                 <div key={i} className="schedule-card">
                   <div className="schedule-card__header" style={{ borderLeftColor: cls.color }}>
@@ -356,7 +465,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="schedule-cta reveal reveal-delay-2">
+            <div className="schedule-cta">
               <p>¿Quieres ver el horario completo o reservar plaza?</p>
               <Link to={user ? '/dashboard' : '/register'} className="btn btn-outline">
                 {user ? 'Ir a mi cuenta →' : 'Únete y reserva →'}
@@ -368,15 +477,15 @@ export default function Home() {
 
       {/* ── Testimonials ── */}
       {isVisible(config, 'section_testimonials') && (
-        <section className="section" ref={refTestim}>
+        <section className="section">
           <div className="container">
-            <div className="section__head reveal">
+            <div className="section__head">
               <span className="section__tag">Testimonios</span>
               <h2 className="section__title">Historias reales</h2>
             </div>
             <div className="testimonials-grid">
               {TESTIMONIALS.map((t, i) => (
-                <div key={i} className={`testimonial-card reveal reveal-delay-${i + 1}`}>
+                <div key={i} className="testimonial-card">
                   <div className="testimonial-card__stars">
                     {Array.from({ length: t.stars }, (_, i) => <IconStar key={i} size={14} />)}
                   </div>
@@ -395,10 +504,10 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── CTA — solo sin suscripción ── */}
+      {/* ── CTA ── */}
       {!hasActiveSub && isVisible(config, 'section_cta') && (
-        <section className="cta-section" ref={refCta}>
-          <div className="container cta-section__inner reveal">
+        <section className="cta-section">
+          <div className="container cta-section__inner">
             <h2 className="cta-section__title">{config.cta_title}</h2>
             <p>{config.cta_subtitle}</p>
             <Link to={user ? '/dashboard' : '/register'} className="btn btn-primary cta-section__btn">
