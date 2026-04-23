@@ -1,28 +1,38 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { resetPasswordForEmail, updatePassword, supabase } from '../lib/supabase'
-import './Auth.css'
+import { NEON, BG, MUTED, TEXT, Input, NeonButton, Icon } from '../components/UI'
+
+function AuthLayout({ children, title, sub }) {
+  return (
+    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.25rem' }}>
+      <div style={{ position: 'fixed', inset: 0, background: `radial-gradient(ellipse 60% 50% at 50% 30%, rgba(194,255,0,0.045), transparent)`, pointerEvents: 'none' }} />
+      <div style={{ width: '100%', maxWidth: '420px', position: 'relative' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link to="/" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.7rem', fontWeight: 800, textDecoration: 'none', display: 'inline-block', marginBottom: '0.75rem' }}>
+            <span style={{ color: NEON }}>TOTAL</span><span style={{ color: TEXT }}>FITNESS</span>
+          </Link>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.5rem,4vw,1.8rem)', fontWeight: 800, color: TEXT, margin: '0 0 0.4rem' }}>{title}</h1>
+          {sub && <p style={{ color: MUTED, fontFamily: "'Inter', sans-serif", fontSize: '0.85rem' }}>{sub}</p>}
+        </div>
+        <div style={{ background: '#0d1219', border: `1px solid ${NEON}20`, borderRadius: '16px', padding: 'clamp(1.5rem,4vw,2.25rem)', boxShadow: '0 0 60px rgba(0,0,0,0.5)' }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ResetPassword() {
   const navigate = useNavigate()
-
-  // Supabase sends a fragment (#access_token=...) after clicking the email link
-  const [mode, setMode]       = useState('request') // 'request' | 'update'
-  const [email, setEmail]     = useState('')
-  const [pass, setPass]       = useState('')
-  const [pass2, setPass2]     = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
-  const [success, setSuccess] = useState('')
+  const [mode, setMode]         = useState('request') // 'request' | 'update' | 'sent'
+  const [email, setEmail]       = useState('')
+  const [newPass, setNewPass]   = useState('')
+  const [newPass2, setNewPass2] = useState('')
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
   useEffect(() => {
-    // If there's an access_token in the URL fragment, Supabase has set the session
-    const hash = window.location.hash
-    if (hash.includes('access_token') || hash.includes('type=recovery')) {
-      setMode('update')
-    }
-
-    // Also listen for the PASSWORD_RECOVERY auth event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') setMode('update')
     })
@@ -32,14 +42,12 @@ export default function ResetPassword() {
   const handleRequest = async (e) => {
     e.preventDefault()
     setError('')
-    setSuccess('')
-    if (!email.trim()) { setError('Introduce tu email.'); return }
     setLoading(true)
     try {
       await resetPasswordForEmail(email)
-      setSuccess('Revisa tu email. Hemos enviado un enlace para restablecer tu contraseña.')
+      setMode('sent')
     } catch (err) {
-      setError(err.message || 'Error al enviar el email. Inténtalo de nuevo.')
+      setError(err.message || 'Error al enviar el enlace.')
     } finally {
       setLoading(false)
     }
@@ -48,13 +56,12 @@ export default function ResetPassword() {
   const handleUpdate = async (e) => {
     e.preventDefault()
     setError('')
-    if (pass.length < 6) { setError('La contraseña debe tener al menos 6 caracteres.'); return }
-    if (pass !== pass2)  { setError('Las contraseñas no coinciden.'); return }
+    if (newPass !== newPass2) { setError('Las contraseñas no coinciden.'); return }
+    if (newPass.length < 6)   { setError('Mínimo 6 caracteres.'); return }
     setLoading(true)
     try {
-      await updatePassword(pass)
-      setSuccess('¡Contraseña actualizada! Redirigiendo...')
-      setTimeout(() => navigate('/dashboard'), 2000)
+      await updatePassword(newPass)
+      navigate('/dashboard')
     } catch (err) {
       setError(err.message || 'Error al actualizar la contraseña.')
     } finally {
@@ -62,81 +69,53 @@ export default function ResetPassword() {
     }
   }
 
-  return (
-    <div className="auth-page page">
-      <div className="auth-card animate-fade-up">
-        <div className="auth-card__header">
-          <Link to="/" className="auth-card__logo">TOTAL<span>FITNESS</span></Link>
-          <h1 className="auth-card__title">
-            {mode === 'request' ? 'Recuperar cuenta' : 'Nueva contraseña'}
-          </h1>
-          <p className="auth-card__sub">
-            {mode === 'request'
-              ? 'Te enviaremos un enlace a tu email'
-              : 'Elige una nueva contraseña segura'
-            }
+  if (mode === 'sent') {
+    return (
+      <AuthLayout title="Enlace enviado" sub="">
+        <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: `${NEON}12`, border: `1px solid ${NEON}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <Icon name="mail" size={24} color={NEON} />
+          </div>
+          <p style={{ color: TEXT, fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Revisa tu bandeja</p>
+          <p style={{ color: MUTED, fontFamily: "'Inter', sans-serif", fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+            Hemos enviado un enlace a <strong style={{ color: NEON }}>{email}</strong>
           </p>
+          <NeonButton fullWidth onClick={() => navigate('/login')}>Volver al login</NeonButton>
         </div>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <Link to="/login" style={{ color: MUTED, fontSize: '0.82rem', fontFamily: "'Inter', sans-serif", textDecoration: 'none' }}>← Volver</Link>
+        </div>
+      </AuthLayout>
+    )
+  }
 
-        {mode === 'request' ? (
-          <form className="auth-form" onSubmit={handleRequest}>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-            </div>
+  if (mode === 'update') {
+    return (
+      <AuthLayout title="Nueva contraseña" sub="Introduce tu nueva contraseña">
+        <form onSubmit={handleUpdate}>
+          <Input label="Nueva contraseña" type="password" value={newPass} onChange={e => setNewPass(e.target.value)} placeholder="Mínimo 6 caracteres" required />
+          <Input label="Confirmar contraseña" type="password" value={newPass2} onChange={e => setNewPass2(e.target.value)} placeholder="Repite la contraseña" required />
+          {error && (
+            <div style={{ color: '#ff4466', fontSize: '0.8rem', fontFamily: "'Inter', sans-serif", marginBottom: '1rem', background: '#ff446612', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ff446630' }}>{error}</div>
+          )}
+          <NeonButton fullWidth type="submit" loading={loading}>{loading ? 'Guardando...' : 'Actualizar contraseña'}</NeonButton>
+        </form>
+      </AuthLayout>
+    )
+  }
 
-            {error   && <p className="auth-error">{error}</p>}
-            {success && <p className="auth-success">{success}</p>}
-
-            <button type="submit" className="btn btn-primary auth-submit" disabled={loading || !!success}>
-              {loading ? <span className="spinner" /> : 'Enviar enlace'}
-            </button>
-          </form>
-        ) : (
-          <form className="auth-form" onSubmit={handleUpdate}>
-            <div className="form-group">
-              <label className="form-label">Nueva contraseña</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Mínimo 6 caracteres"
-                value={pass}
-                onChange={e => setPass(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Confirmar contraseña</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Repite la contraseña"
-                value={pass2}
-                onChange={e => setPass2(e.target.value)}
-                required
-              />
-            </div>
-
-            {error   && <p className="auth-error">{error}</p>}
-            {success && <p className="auth-success">{success}</p>}
-
-            <button type="submit" className="btn btn-primary auth-submit" disabled={loading || !!success}>
-              {loading ? <span className="spinner" /> : 'Actualizar contraseña'}
-            </button>
-          </form>
+  return (
+    <AuthLayout title="Recuperar contraseña" sub="Te enviaremos un enlace de acceso">
+      <form onSubmit={handleRequest}>
+        <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" required />
+        {error && (
+          <div style={{ color: '#ff4466', fontSize: '0.8rem', fontFamily: "'Inter', sans-serif", marginBottom: '1rem', background: '#ff446612', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ff446630' }}>{error}</div>
         )}
-
-        <p className="auth-footer">
-          <Link to="/login">← Volver a iniciar sesión</Link>
-        </p>
+        <NeonButton fullWidth type="submit" loading={loading} disabled={!email}>{loading ? 'Enviando...' : 'Enviar enlace'}</NeonButton>
+      </form>
+      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        <Link to="/login" style={{ color: MUTED, fontSize: '0.82rem', fontFamily: "'Inter', sans-serif", textDecoration: 'none' }}>← Volver</Link>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

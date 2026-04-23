@@ -1,13 +1,33 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signIn } from '../lib/supabase'
-import './Auth.css'
+import { NEON, CYAN, BG, MUTED, TEXT, BORDER, Input, NeonButton } from '../components/UI'
+
+function AuthLayout({ children, title, sub }) {
+  return (
+    <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.25rem' }}>
+      <div style={{ position: 'fixed', inset: 0, background: `radial-gradient(ellipse 60% 50% at 50% 30%, rgba(194,255,0,0.045), transparent)`, pointerEvents: 'none' }} />
+      <div style={{ width: '100%', maxWidth: '420px', position: 'relative' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link to="/" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.7rem', fontWeight: 800, textDecoration: 'none', display: 'inline-block', marginBottom: '0.75rem' }}>
+            <span style={{ color: NEON }}>TOTAL</span><span style={{ color: TEXT }}>FITNESS</span>
+          </Link>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.5rem,4vw,1.8rem)', fontWeight: 800, color: TEXT, margin: '0 0 0.4rem' }}>{title}</h1>
+          {sub && <p style={{ color: MUTED, fontFamily: "'Inter', sans-serif", fontSize: '0.85rem' }}>{sub}</p>}
+        </div>
+        <div style={{ background: '#0d1219', border: `1px solid ${NEON}20`, borderRadius: '16px', padding: 'clamp(1.5rem,4vw,2.25rem)', boxShadow: '0 0 60px rgba(0,0,0,0.5)' }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Login() {
-  const navigate          = useNavigate()
-  const [email, setEmail] = useState('')
-  const [pass, setPass]   = useState('')
-  const [error, setError] = useState('')
+  const navigate = useNavigate()
+  const [email, setEmail]   = useState('')
+  const [pass, setPass]     = useState('')
+  const [error, setError]   = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
@@ -17,7 +37,7 @@ export default function Login() {
     try {
       await signIn(email, pass)
       navigate('/dashboard')
-    } catch (err) {
+    } catch {
       setError('Credenciales incorrectas. Inténtalo de nuevo.')
     } finally {
       setLoading(false)
@@ -25,53 +45,21 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-page page">
-      <div className="auth-card animate-fade-up">
-        <div className="auth-card__header">
-          <Link to="/" className="auth-card__logo">TOTAL<span>FITNESS</span></Link>
-          <h1 className="auth-card__title">Acceder</h1>
-          <p className="auth-card__sub">Bienvenido/a de vuelta</p>
+    <AuthLayout title="Bienvenido de vuelta" sub="Accede a tu área personal">
+      <form onSubmit={handleSubmit}>
+        <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" required />
+        <Input label="Contraseña" type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" required />
+        {error && (
+          <div style={{ color: '#ff4466', fontSize: '0.8rem', fontFamily: "'Inter', sans-serif", marginBottom: '1rem', background: '#ff446612', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #ff446630' }}>{error}</div>
+        )}
+        <div style={{ textAlign: 'right', marginBottom: '1.1rem' }}>
+          <Link to="/reset-password" style={{ color: NEON, fontSize: '0.8rem', fontFamily: "'Inter', sans-serif", textDecoration: 'none' }}>¿Olvidaste tu contraseña?</Link>
         </div>
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-input"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <div className="auth-label-row">
-              <label className="form-label">Contraseña</label>
-              <Link to="/reset-password" className="auth-forgot">¿Olvidaste tu contraseña?</Link>
-            </div>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="••••••••"
-              value={pass}
-              onChange={e => setPass(e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <p className="auth-error">{error}</p>}
-
-          <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
-            {loading ? <span className="spinner" /> : 'Iniciar sesión'}
-          </button>
-        </form>
-
-        <p className="auth-footer">
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-        </p>
+        <NeonButton fullWidth type="submit" loading={loading}>{loading ? 'Entrando...' : 'Entrar'}</NeonButton>
+      </form>
+      <div style={{ textAlign: 'center', marginTop: '1.5rem', color: MUTED, fontSize: '0.85rem', fontFamily: "'Inter', sans-serif" }}>
+        ¿No tienes cuenta? <Link to="/register" style={{ color: NEON, textDecoration: 'none' }}>Regístrate</Link>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

@@ -1,92 +1,56 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { signOut } from '../lib/supabase'
-import { IconClock, IconBolt, IconMember } from './Icons'
-import './Footer.css'
+import { useNavigate } from 'react-router-dom'
+import { NEON, MUTED, TEXT, BORDER, useWidth, Icon } from './UI'
 
 export default function Footer() {
-  const { user, isAdmin } = useAuth()
-  const navigate          = useNavigate()
-
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/')
-  }
+  const navigate = useNavigate()
+  const bp       = useWidth()
+  const isMobile = bp === 'xs'
 
   return (
-    <footer className="footer">
-      <div className="container footer__inner">
+    <footer style={{ background: '#04060b', borderTop: `1px solid ${BORDER}`, padding: 'clamp(3rem,6vw,4rem) clamp(1.25rem,4vw,2rem) 2rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2,1fr)', gap: '2.5rem', marginBottom: '2.5rem' }}>
+          <div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.7rem', fontWeight: 800, marginBottom: '0.875rem' }}>
+              <span style={{ color: NEON }}>TOTAL</span><span style={{ color: TEXT }}>FITNESS</span>
+            </div>
+            <p style={{ color: MUTED, fontSize: '0.85rem', lineHeight: 1.7, fontFamily: "'Inter', sans-serif", maxWidth: '260px' }}>El gimnasio más tecnológico de Pilar de la Horadada. Energía, rendimiento y resultados reales.</p>
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {[
+                { icon: 'pin',   text: 'C/ Fitness 42, Pilar de la Horadada' },
+                { icon: 'phone', text: '+34 966 123 456' },
+                { icon: 'mail',  text: 'info@totalfitness.es' },
+              ].map(({ icon, text }) => (
+                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <Icon name={icon} size={14} color={NEON} />
+                  <span style={{ color: MUTED, fontSize: '0.8rem', fontFamily: "'Inter', sans-serif" }}>{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {/* ── Brand ── */}
-        <div className="footer__brand">
-          <Link to="/" className="footer__logo">TOTAL<span>FITNESS</span></Link>
-          <p className="footer__tagline">Forja tu mejor versión cada día.</p>
-          <div className="footer__social">
-            <a href="#" aria-label="Instagram" className="footer__social-link">IG</a>
-            <a href="#" aria-label="Facebook"  className="footer__social-link">FB</a>
-            <a href="#" aria-label="YouTube"   className="footer__social-link">YT</a>
-            <a href="#" aria-label="TikTok"    className="footer__social-link">TK</a>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1.5rem' }}>
+            {[
+              { title: 'Navegación', links: [['Inicio', '/'], ['Precios', '/pricing'], ['Clases', '/schedule']] },
+              { title: 'Cuenta',     links: [['Entrar', '/login'], ['Registrarse', '/register'], ['Dashboard', '/dashboard']] },
+              { title: 'Legal',      links: [['Privacidad', null], ['Términos', null], ['Cookies', null]] },
+            ].map(col => (
+              <div key={col.title}>
+                <div style={{ color: TEXT, fontFamily: "'Inter', sans-serif", fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>{col.title}</div>
+                {col.links.map(([label, path]) => (
+                  <div key={label} onClick={() => path && navigate(path)} style={{ color: MUTED, fontSize: '0.85rem', fontFamily: "'Inter', sans-serif", marginBottom: '0.55rem', cursor: path ? 'pointer' : 'default', transition: 'color 0.2s' }}
+                    onMouseEnter={e => { if (path) e.currentTarget.style.color = TEXT }}
+                    onMouseLeave={e => e.currentTarget.style.color = MUTED}
+                  >{label}</div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* ── Navigation ── */}
-        <nav className="footer__nav">
-          <span className="footer__col-label">Navegación</span>
-          <Link to="/">Inicio</Link>
-          {user  && <Link to="/dashboard">Mi Cuenta</Link>}
-          {isAdmin && <Link to="/admin">Panel Admin</Link>}
-          {!user && <Link to="/login">Acceder</Link>}
-          {!user && <Link to="/register">Registro</Link>}
-        </nav>
-
-        {/* ── Info ── */}
-        <div className="footer__info">
-          <span className="footer__col-label">Gimnasio</span>
-          <p>Av. la Venta, S/N</p>
-          <p>03190 Pilar de la Horadada</p>
-          <p>Alicante, España</p>
-          <a href="mailto:info@totalfitness.es" className="footer__link">info@totalfitness.es</a>
-          <a href="tel:+34965000000" className="footer__link">+34 965 000 000</a>
-        </div>
-
-        {/* ── Hours ── */}
-        <div className="footer__hours">
-          <span className="footer__col-label">Horario</span>
-          <div className="footer__hours-row">
-            <span>Lun – Vie</span>
-            <strong>06:00 – 23:00</strong>
-          </div>
-          <div className="footer__hours-row">
-            <span>Sáb – Dom</span>
-            <strong>08:00 – 21:00</strong>
-          </div>
-          <div className="footer__hours-row footer__hours-row--accent">
-            <span><IconClock size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.3em' }} />Gym 24/7</span>
-            <strong>Acceso libre</strong>
-          </div>
-        </div>
-
-      </div>
-
-      {/* ── Bottom bar ── */}
-      <div className="footer__bottom">
-        <div className="container footer__bottom-inner">
-          <p>© {new Date().getFullYear()} TotalFitness. Todos los derechos reservados.</p>
-          <div className="footer__bottom-right">
-            {user && (
-              <span className="footer__user-badge">
-                {isAdmin
-                  ? <><IconBolt size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.25em' }} />Admin</>
-                  : <><IconMember size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '0.25em' }} />Miembro</>
-                }
-              </span>
-            )}
-            {user && (
-              <button className="footer__logout" onClick={handleSignOut}>
-                Cerrar sesión
-              </button>
-            )}
-          </div>
+        <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <span style={{ color: MUTED, fontSize: '0.75rem', fontFamily: "'Inter', sans-serif" }}>© 2026 TotalFitness · Pilar de la Horadada, Alicante</span>
+          <span style={{ color: `${NEON}88`, fontSize: '0.72rem', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.12em' }}>ENERGÍA · TECNOLOGÍA · RENDIMIENTO</span>
         </div>
       </div>
     </footer>
